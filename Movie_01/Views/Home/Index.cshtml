@@ -1,0 +1,318 @@
+﻿@model MovieApp.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "لوحة التحكم";
+}
+
+<style>
+    .stat-card {
+        border-radius: 15px;
+        padding: 1.5rem;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 3rem;
+            opacity: 0.8;
+        }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .card-gradient-1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card-gradient-2 {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .card-gradient-3 {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .card-gradient-4 {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .card-gradient-5 {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .card-gradient-6 {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+    }
+
+    .movie-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .movie-card img {
+            height: 300px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+    .movie-card-body {
+        padding: 1.5rem;
+    }
+
+    .movie-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .badge-status {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+        margin: 2rem 0 1.5rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #667eea;
+        display: inline-block;
+    }
+
+    .quick-actions {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .category-stat {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .category-stat .count {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+</style>
+
+<div class="dashboard">
+    <h1 class="mb-4">
+        <i class="fas fa-chart-line me-2"></i>
+        لوحة التحكم
+    </h1>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-md-4 col-lg-2">
+            <div class="stat-card card-gradient-1 text-center">
+                <i class="fas fa-film"></i>
+                <div class="stat-number">@Model.TotalMovies</div>
+                <div class="stat-label">إجمالي الأفلام</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="stat-card card-gradient-2 text-center">
+                <i class="fas fa-play-circle"></i>
+                <div class="stat-number">@Model.NowShowingMovies</div>
+                <div class="stat-label">يُعرض الآن</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="stat-card card-gradient-3 text-center">
+                <i class="fas fa-clock"></i>
+                <div class="stat-number">@Model.ComingSoonMovies</div>
+                <div class="stat-label">قريباً</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="stat-card card-gradient-4 text-center">
+                <i class="fas fa-user-tie"></i>
+                <div class="stat-number">@Model.TotalActors</div>
+                <div class="stat-label">الممثلين</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="stat-card card-gradient-5 text-center">
+                <i class="fas fa-building"></i>
+                <div class="stat-number">@Model.TotalCinemas</div>
+                <div class="stat-label">السينمات</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="stat-card card-gradient-6 text-center">
+                <i class="fas fa-tags"></i>
+                <div class="stat-number">@Model.TotalCategories</div>
+                <div class="stat-label">التصنيفات</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h4 class="mb-3"><i class="fas fa-bolt me-2"></i>إجراءات سريعة</h4>
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <a asp-controller="Movies" asp-action="Create" class="btn btn-primary w-100">
+                    <i class="fas fa-plus-circle me-2"></i>إضافة فيلم جديد
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a asp-controller="Actors" asp-action="Create" class="btn btn-success w-100">
+                    <i class="fas fa-user-plus me-2"></i>إضافة ممثل
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a asp-controller="Cinemas" asp-action="Create" class="btn btn-info w-100">
+                    <i class="fas fa-plus-square me-2"></i>إضافة سينما
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a asp-controller="Categories" asp-action="Create" class="btn btn-warning w-100">
+                    <i class="fas fa-tag me-2"></i>إضافة تصنيف
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Movies -->
+        <div class="col-lg-8">
+            <h2 class="section-title">
+                <i class="fas fa-fire me-2"></i>
+                أحدث الأفلام
+            </h2>
+            <div class="row">
+                @foreach (var movie in Model.RecentMovies)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="movie-card">
+                            <img src="@(string.IsNullOrEmpty(movie.MainImage) ? "/images/placeholder.jpg" : movie.MainImage)"
+                                 alt="@movie.Name" />
+                            <div class="movie-card-body">
+                                <h5 class="mb-2">@movie.Name</h5>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-tag me-1"></i>@movie.Category?.Name
+                                </p>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-building me-1"></i>@movie.Cinema?.Name
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="movie-price">@movie.Price.ToString("C")</span>
+                                    <span class="badge @(movie.Status == MovieApp.Models.MovieStatus.NowShowing ? "bg-success" : "bg-warning") badge-status">
+                                        @(movie.Status == MovieApp.Models.MovieStatus.NowShowing ? "يُعرض الآن" : "قريباً")
+                                    </span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a asp-controller="Movies" asp-action="Details" asp-route-id="@movie.Id"
+                                       class="btn btn-sm btn-outline-primary flex-fill">
+                                        <i class="fas fa-eye"></i> تفاصيل
+                                    </a>
+                                    <a asp-controller="Movies" asp-action="Edit" asp-route-id="@movie.Id"
+                                       class="btn btn-sm btn-outline-warning flex-fill">
+                                        <i class="fas fa-edit"></i> تعديل
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (!Model.RecentMovies.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    لا توجد أفلام حالياً. قم بإضافة أول فيلم!
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Upcoming Movies -->
+            <h3 class="section-title">
+                <i class="fas fa-calendar-alt me-2"></i>
+                الأفلام القادمة
+            </h3>
+            <div class="bg-white rounded p-3 shadow-sm mb-4">
+                @if (Model.UpcomingMovies.Any())
+                {
+                    <ul class="list-unstyled">
+                        @foreach (var movie in Model.UpcomingMovies)
+                        {
+                            <li class="mb-3 pb-3 border-bottom">
+                                <h6 class="mb-1">@movie.Name</h6>
+                                <p class="text-muted small mb-1">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    @movie.ReleaseDateTime.ToString("dd/MM/yyyy")
+                                </p>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-tag me-1"></i>@movie.Category?.Name
+                                </p>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted text-center">لا توجد أفلام قادمة</p>
+                }
+            </div>
+
+            <!-- Movies by Category -->
+            <h3 class="section-title">
+                <i class="fas fa-chart-pie me-2"></i>
+                الأفلام حسب التصنيف
+            </h3>
+            <div class="bg-white rounded p-3 shadow-sm">
+                @if (Model.MoviesByCategory.Any())
+                {
+                    @foreach (var cat in Model.MoviesByCategory)
+                    {
+                        <div class="category-stat">
+                            <span>@cat.CategoryName</span>
+                            <span class="count">@cat.MovieCount</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center">لا توجد تصنيفات</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

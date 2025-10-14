@@ -1,0 +1,93 @@
+﻿@model MovieApp.Models.Actor
+@{
+    ViewData["Title"] = "حذف الممثل";
+}
+
+<style>
+    .delete-container {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .actor-photo {
+        max-width: 300px;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin: 1rem auto;
+        display: block;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+</style>
+
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-2"></i>رجوع
+    </a>
+</div>
+
+<div class="delete-container">
+    <div class="alert alert-danger">
+        <h3>
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            تحذير: حذف الممثل
+        </h3>
+        <p class="mb-0">هل أنت متأكد أنك تريد حذف هذا الممثل؟</p>
+    </div>
+
+    <div class="text-center mb-4">
+        <img src="@(string.IsNullOrEmpty(Model.ProfilePicture) ? "/images/placeholder-actor.jpg" : Model.ProfilePicture)"
+             alt="@Model.Name" class="actor-photo" />
+    </div>
+
+    <h2 class="text-center mb-4">@Model.Name</h2>
+
+    <dl class="row">
+        @if (Model.DateOfBirth.HasValue)
+        {
+            <dt class="col-sm-4">تاريخ الميلاد:</dt>
+            <dd class="col-sm-8">@Model.DateOfBirth.Value.ToString("dd/MM/yyyy")</dd>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Bio))
+        {
+            <dt class="col-sm-4">السيرة الذاتية:</dt>
+            <dd class="col-sm-8">@Model.Bio</dd>
+        }
+
+        <dt class="col-sm-4">عدد الأفلام:</dt>
+        <dd class="col-sm-8">
+            <span class="badge bg-primary fs-5">@Model.MovieActors.Count فيلم</span>
+        </dd>
+    </dl>
+
+    @if (Model.MovieActors.Any())
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>تنبيه:</strong> سيتم إزالة هذا الممثل من جميع الأفلام التي شارك فيها.
+        </div>
+
+        <h5 class="mt-4">الأفلام التي شارك فيها:</h5>
+        <ul class="list-group">
+            @foreach (var movieActor in Model.MovieActors)
+            {
+                <li class="list-group-item">
+                    <i class="fas fa-film me-2"></i>@movieActor.Movie.Name
+                </li>
+            }
+        </ul>
+    }
+
+    <form asp-action="Delete" method="post" class="mt-4">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger btn-lg">
+            <i class="fas fa-trash me-2"></i>تأكيد الحذف
+        </button>
+        <a asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="fas fa-times me-2"></i>إلغاء
+        </a>
+    </form>
+</div>

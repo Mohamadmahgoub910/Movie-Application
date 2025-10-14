@@ -1,0 +1,192 @@
+﻿@model MovieApp.ViewModels.MovieViewModel
+@{
+    ViewData["Title"] = "إضافة فيلم جديد";
+}
+
+<style>
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .image-preview {
+        max-width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-top: 1rem;
+    }
+
+    .sub-images-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 1rem;
+    }
+
+        .sub-images-preview img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+</style>
+
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-2"></i>رجوع
+    </a>
+</div>
+
+<div class="form-container">
+    <h2 class="mb-4">
+        <i class="fas fa-plus-circle me-2"></i>
+        إضافة فيلم جديد
+    </h2>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="row">
+            <!-- Basic Info -->
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Price" class="form-label"></label>
+                        <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Duration" class="form-label"></label>
+                        <input asp-for="Duration" class="form-control" type="number" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CategoryId" class="form-label"></label>
+                        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+                            <option value="">-- اختر التصنيف --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CinemaId" class="form-label"></label>
+                        <select asp-for="CinemaId" class="form-select" asp-items="ViewBag.Cinemas">
+                            <option value="">-- اختر السينما --</option>
+                        </select>
+                        <span asp-validation-for="CinemaId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Status" class="form-label"></label>
+                        <select asp-for="Status" class="form-select">
+                            <option value="0">قريباً</option>
+                            <option value="1">يُعرض الآن</option>
+                            <option value="2">انتهى العرض</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ReleaseDateTime" class="form-label"></label>
+                        <input asp-for="ReleaseDateTime" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="ReleaseDateTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SelectedActorIds" class="form-label"></label>
+                    <select asp-for="SelectedActorIds" class="form-select" asp-items="ViewBag.Actors" multiple size="5">
+                    </select>
+                    <small class="form-text text-muted">اضغط Ctrl لاختيار أكثر من ممثل</small>
+                    <span asp-validation-for="SelectedActorIds" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Images Section -->
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label asp-for="MainImageFile" class="form-label">الصورة الرئيسية</label>
+                    <input asp-for="MainImageFile" class="form-control" type="file" accept="image/*"
+                           onchange="previewMainImage(event)" />
+                    <span asp-validation-for="MainImageFile" class="text-danger"></span>
+                    <img id="mainImagePreview" class="image-preview" style="display:none;" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SubImageFiles" class="form-label">صور إضافية</label>
+                    <input asp-for="SubImageFiles" class="form-control" type="file" accept="image/*"
+                           multiple onchange="previewSubImages(event)" />
+                    <span asp-validation-for="SubImageFiles" class="text-danger"></span>
+                    <div id="subImagesPreview" class="sub-images-preview"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>حفظ
+            </button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times me-2"></i>إلغاء
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function previewMainImage(event) {
+            const preview = document.getElementById('mainImagePreview');
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewSubImages(event) {
+            const preview = document.getElementById('subImagesPreview');
+            preview.innerHTML = '';
+            const files = event.target.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+}
