@@ -16,6 +16,7 @@
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<Folder Include="Controllers\" />
 		<Folder Include="wwwroot\images\movies\gallery\" />
 		<Folder Include="wwwroot\images\actors\" />
 		<Folder Include="wwwroot\images\categories\" />

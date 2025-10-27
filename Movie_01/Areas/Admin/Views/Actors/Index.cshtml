@@ -1,0 +1,110 @@
+﻿@using MovieApp.Core.Entities
+@model IEnumerable<Actor>
+@{
+    ViewData["Title"] = "الممثلين";
+}
+
+<style>
+    .actor-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+        background: white;
+        text-align: center;
+    }
+
+        .actor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .actor-card img {
+            height: 300px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+    .actor-card-body {
+        padding: 1.5rem;
+    }
+
+    .movies-count {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>
+        <i class="fas fa-user-tie me-2"></i>
+        الممثلين
+    </h1>
+    <a asp-action="Create" class="btn btn-primary btn-lg">
+        <i class="fas fa-plus-circle me-2"></i>إضافة ممثل جديد
+    </a>
+</div>
+
+<div class="row">
+    @if (Model.Any())
+    {
+        @foreach (var actor in Model)
+        {
+            <div class="col-md-6 col-lg-3">
+                <div class="actor-card">
+                    <img src="@(string.IsNullOrEmpty(actor.ProfilePicture) ? "/images/placeholder-actor.jpg" : actor.ProfilePicture)"
+                         alt="@actor.Name" />
+                    <div class="actor-card-body">
+                        <h5 class="mb-2">@actor.Name</h5>
+                        @if (actor.DateOfBirth.HasValue)
+                        {
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-birthday-cake me-1"></i>
+                                @actor.DateOfBirth.Value.ToString("dd/MM/yyyy")
+                            </p>
+                        }
+                        @if (!string.IsNullOrEmpty(actor.Bio))
+                        {
+                            <p class="text-muted small mb-3">
+                                @(actor.Bio.Length > 60 ? actor.Bio.Substring(0, 60) + "..." : actor.Bio)
+                            </p>
+                        }
+                        <div class="mb-3">
+                            <span class="text-muted">عدد الأفلام:</span>
+                            <span class="movies-count">@actor.MovieActors.Count</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@actor.Id"
+                               class="btn btn-sm btn-outline-primary flex-fill">
+                                <i class="fas fa-eye"></i> تفاصيل
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@actor.Id"
+                               class="btn btn-sm btn-outline-warning flex-fill">
+                                <i class="fas fa-edit"></i> تعديل
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@actor.Id"
+                               class="btn btn-sm btn-outline-danger flex-fill">
+                                <i class="fas fa-trash"></i> حذف
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <h4>لا يوجد ممثلين</h4>
+                <p>ابدأ بإضافة أول ممثل.</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i>إضافة ممثل جديد
+                </a>
+            </div>
+        </div>
+    }
+</div>

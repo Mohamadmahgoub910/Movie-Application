@@ -1,0 +1,102 @@
+﻿@using MovieApp.Core.Entities
+@model Movie
+@{
+    ViewData["Title"] = "حذف الفيلم";
+}
+
+<style>
+    .delete-container {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .movie-poster {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 15px;
+    }
+</style>
+
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-2"></i>رجوع
+    </a>
+</div>
+
+<div class="delete-container">
+    <div class="alert alert-danger">
+        <h3>
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            تحذير: حذف الفيلم
+        </h3>
+        <p class="mb-0">هل أنت متأكد أنك تريد حذف هذا الفيلم؟ هذا الإجراء لا يمكن التراجع عنه!</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <img src="@(string.IsNullOrEmpty(Model.MainImage) ? "/images/placeholder.jpg" : Model.MainImage)"
+                 alt="@Model.Name" class="movie-poster" />
+        </div>
+
+        <div class="col-md-8">
+            <h2 class="mb-3">@Model.Name</h2>
+
+            <dl class="row">
+                <dt class="col-sm-4">الوصف:</dt>
+                <dd class="col-sm-8">@Model.Description</dd>
+
+                <dt class="col-sm-4">السعر:</dt>
+                <dd class="col-sm-8">@Model.Price.ToString("C")</dd>
+
+                <dt class="col-sm-4">الحالة:</dt>
+                <dd class="col-sm-8">
+                    <span class="badge @(Model.Status == MovieStatus.NowShowing ? "bg-success" : Model.Status == MovieStatus.ComingSoon ? "bg-warning" : "bg-secondary")">
+                        @(Model.Status == MovieStatus.NowShowing ? "يُعرض الآن" : Model.Status == MovieStatus.ComingSoon ? "قريباً" : "انتهى العرض")
+                    </span>
+                </dd>
+
+                <dt class="col-sm-4">تاريخ العرض:</dt>
+                <dd class="col-sm-8">@Model.ReleaseDateTime.ToString("dd/MM/yyyy")</dd>
+
+                @if (Model.Duration.HasValue)
+                {
+                    <dt class="col-sm-4">المدة:</dt>
+                    <dd class="col-sm-8">@Model.Duration دقيقة</dd>
+                }
+
+                <dt class="col-sm-4">التصنيف:</dt>
+                <dd class="col-sm-8">@Model.Category?.Name</dd>
+
+                <dt class="col-sm-4">السينما:</dt>
+                <dd class="col-sm-8">@Model.Cinema?.Name</dd>
+
+                @if (Model.MovieActors.Any())
+                {
+                    <dt class="col-sm-4">الممثلين:</dt>
+                    <dd class="col-sm-8">
+                        @string.Join(", ", Model.MovieActors.Select(ma => ma.Actor.Name))
+                    </dd>
+                }
+
+                @if (Model.SubImages.Any())
+                {
+                    <dt class="col-sm-4">عدد الصور الإضافية:</dt>
+                    <dd class="col-sm-8">@Model.SubImages.Count صورة</dd>
+                }
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="mt-4">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger btn-lg">
+            <i class="fas fa-trash me-2"></i>تأكيد الحذف
+        </button>
+        <a asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="fas fa-times me-2"></i>إلغاء
+        </a>
+    </form>
+</div>
