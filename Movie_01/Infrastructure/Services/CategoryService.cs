@@ -2,7 +2,7 @@
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
 using MovieApp.Infrastructure.Data;
-
+using Microsoft.EntityFrameworkCore;
 namespace MovieApp.Infrastructure.Services
 {
     // ═══════════════════════════════════════════════════════════
@@ -82,3 +82,4 @@ namespace MovieApp.Infrastructure.Services
             return !await _unitOfWork.Movies.AnyAsync(m => m.CategoryId == id);
         }
     }
+}

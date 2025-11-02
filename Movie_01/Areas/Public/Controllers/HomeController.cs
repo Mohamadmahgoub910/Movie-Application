@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.Core.Entities;
 using MovieApp.Infrastructure.Data;
-using MovieApp.ViewModels;
+using MovieApp.Core.ViewModels;
 
 namespace MovieApp.Areas.Public.Controllers
 {

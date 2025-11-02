@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MovieApp.Application.Services;
 using MovieApp.Core.Interfaces;
 using MovieApp.Infrastructure.Data;
 using MovieApp.Infrastructure.Repositories;

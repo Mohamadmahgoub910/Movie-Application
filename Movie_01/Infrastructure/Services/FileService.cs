@@ -1,5 +1,5 @@
 ﻿using MovieApp.Core.Interfaces;
-
+using Microsoft.EntityFrameworkCore;
 namespace MovieApp.Infrastructure.Services
 {
     /// <summary>

@@ -1,0 +1,235 @@
+﻿@model MovieApp.Core.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "الرئيسية - لوحة التحكم";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-home"></i> لوحة التحكم
+            </h1>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Total Movies -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">إجمالي الأفلام</h6>
+                            <h2 class="mb-0">@Model.TotalMovies</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-film fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-area="Admin" asp-controller="Movies" asp-action="Index" class="text-white small">
+                        عرض الكل <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Now Showing -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">يُعرض الآن</h6>
+                            <h2 class="mb-0">@Model.NowShowingMovies</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-play-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coming Soon -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">قريباً</h6>
+                            <h2 class="mb-0">@Model.ComingSoonMovies</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-clock fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Actors -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">الممثلين</h6>
+                            <h2 class="mb-0">@Model.TotalActors</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-users fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-area="Admin" asp-controller="Actors" asp-action="Index" class="text-white small">
+                        عرض الكل <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Movies -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star text-warning"></i> أحدث الأفلام
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.RecentMovies != null && Model.RecentMovies.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>الصورة</th>
+                                        <th>اسم الفيلم</th>
+                                        <th>التصنيف</th>
+                                        <th>السينما</th>
+                                        <th>السعر</th>
+                                        <th>الحالة</th>
+                                        <th>تاريخ العرض</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var movie in Model.RecentMovies)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(movie.MainImage))
+                                                {
+                                                    <img src="~/@movie.MainImage" alt="@movie.Name"
+                                                         class="rounded" style="width: 50px; height: 70px; object-fit: cover;">
+                                                }
+                                                else
+                                                {
+                                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
+                                                         style="width: 50px; height: 70px;">
+                                                        <i class="fas fa-film text-white"></i>
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td class="align-middle">
+                                                <strong>@movie.Name</strong>
+                                            </td>
+                                            <td class="align-middle">@movie.Category?.Name</td>
+                                            <td class="align-middle">@movie.Cinema?.Name</td>
+                                            <td class="align-middle">
+                                                <strong class="text-success">@movie.Price.ToString("N2") جنيه</strong>
+                                            </td>
+                                            <td class="align-middle">
+                                                @switch (movie.Status)
+                                                {
+                                                    case MovieApp.Core.Entities.MovieStatus.NowShowing:
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-play"></i> يُعرض الآن
+                                                        </span>
+                                                        break;
+                                                    case MovieApp.Core.Entities.MovieStatus.ComingSoon:
+                                                        <span class="badge bg-warning text-dark">
+                                                            <i class="fas fa-clock"></i> قريباً
+                                                        </span>
+                                                        break;
+                                                    case MovieApp.Core.Entities.MovieStatus.Ended:
+                                                        <span class="badge bg-secondary">
+                                                            <i class="fas fa-stop"></i> انتهى
+                                                        </span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td class="align-middle">
+                                                @movie.ReleaseDateTime.ToString("dd/MM/yyyy")
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-film fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">لا توجد أفلام حالياً</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Movies -->
+    @if (Model.UpcomingMovies != null && Model.UpcomingMovies.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt text-primary"></i> الأفلام القادمة
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            @foreach (var movie in Model.UpcomingMovies)
+                            {
+                                <div class="col-md-4 col-lg-3">
+                                    <div class="card h-100 shadow-sm">
+                                        @if (!string.IsNullOrEmpty(movie.MainImage))
+                                        {
+                                            <img src="~/@movie.MainImage" class="card-img-top" alt="@movie.Name"
+                                                 style="height: 200px; object-fit: cover;">
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-secondary d-flex align-items-center justify-content-center"
+                                                 style="height: 200px;">
+                                                <i class="fas fa-film fa-3x text-white"></i>
+                                            </div>
+                                        }
+                                        <div class="card-body">
+                                            <h6 class="card-title">@movie.Name</h6>
+                                            <p class="card-text small text-muted mb-2">
+                                                <i class="fas fa-calendar"></i> @movie.ReleaseDateTime.ToString("dd/MM/yyyy")
+                                            </p>
+                                            <p class="card-text">
+                                                <strong class="text-success">@movie.Price.ToString("N2") جنيه</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

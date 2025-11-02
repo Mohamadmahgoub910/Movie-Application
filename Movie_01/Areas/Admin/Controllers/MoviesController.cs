@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.Core.Interfaces;
-using MovieApp.Application.ViewModels;
 using MovieApp.Infrastructure.Data;
+using MovieApp.Core.ViewModels;
 
 namespace MovieApp.Areas.Admin.Controllers
 {

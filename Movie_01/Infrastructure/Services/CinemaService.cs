@@ -5,7 +5,7 @@
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
 using MovieApp.Infrastructure.Data;
-
+using Microsoft.EntityFrameworkCore;
 public class CinemaService : ICinemaService
 {
     private readonly IUnitOfWork _unitOfWork;

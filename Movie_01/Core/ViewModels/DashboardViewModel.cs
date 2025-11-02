@@ -1,6 +1,6 @@
 ﻿using MovieApp.Core.Entities;
 
-namespace MovieApp.ViewModels
+namespace MovieApp.Core.ViewModels
 {
     public class DashboardViewModel
     {
@@ -20,11 +20,5 @@ namespace MovieApp.ViewModels
 
         // Movies by Category
         public List<CategoryMovieCount> MoviesByCategory { get; set; } = new List<CategoryMovieCount>();
-    }
-
-    public class CategoryMovieCount
-    {
-        public string CategoryName { get; set; }
-        public int MovieCount { get; set; }
     }
 }

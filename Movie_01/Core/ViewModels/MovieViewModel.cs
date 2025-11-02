@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MovieApp.Core.Entities;
+using Microsoft.AspNetCore.Http;
 
-namespace MovieApp.ViewModels
+namespace MovieApp.Core.ViewModels
 {
     public class MovieViewModel
     {

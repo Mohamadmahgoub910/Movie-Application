@@ -1,6 +1,6 @@
 ﻿using MovieApp.Core.Entities;
 
-namespace MovieApp.ViewModels
+namespace MovieApp.Core.ViewModels
 {
     public class AnalyticsViewModel
     {
@@ -51,6 +51,12 @@ namespace MovieApp.ViewModels
     {
         public string StatusName { get; set; }
         public int Count { get; set; }
+    }
+
+    public class CategoryMovieCount
+    {
+        public string CategoryName { get; set; }
+        public int MovieCount { get; set; }
     }
 
     public class CinemaMovieCount
