@@ -1,11 +1,9 @@
-﻿using MovieApp.Core.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using MovieApp.Core.Interfaces;
+
 namespace MovieApp.Infrastructure.Services
 {
-    /// <summary>
-    /// File Service Implementation
-    /// SOLID: Single Responsibility - handles file operations only
-    /// </summary>
     public class FileService : IFileService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -17,51 +15,47 @@ namespace MovieApp.Infrastructure.Services
 
         public async Task<string> UploadFileAsync(IFormFile file, string folder)
         {
-            // 1. Validate file
             if (file == null || file.Length == 0)
-                throw new ArgumentException("الملف غير صالح");
+                return null;
 
-            // 2. Create folder path
-            string uploadsFolder = Path.Combine(
-                _webHostEnvironment.WebRootPath,
-                "images",
-                folder
-            );
-
-            // 3. Ensure folder exists
+            // Create folder if not exists
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", folder);
             if (!Directory.Exists(uploadsFolder))
             {
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            // 4. Generate unique filename
-            string uniqueFileName = Guid.NewGuid() + "_" + Path.GetFileName(file.FileName);
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            // Generate unique filename
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // 5. Save file
+            // Save file
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(fileStream);
             }
 
-            // 6. Return relative path
-            return $"/images/{folder}/{uniqueFileName}";
+            // Return relative path
+            return $"uploads/{folder}/{uniqueFileName}";
         }
 
         public async Task<List<string>> UploadFilesAsync(List<IFormFile> files, string folder)
         {
-            var uploadedPaths = new List<string>();
+            var filePaths = new List<string>();
+
+            if (files == null || !files.Any())
+                return filePaths;
 
             foreach (var file in files)
             {
-                if (file != null && file.Length > 0)
+                var path = await UploadFileAsync(file, folder);
+                if (!string.IsNullOrEmpty(path))
                 {
-                    var path = await UploadFileAsync(file, folder);
-                    uploadedPaths.Add(path);
+                    filePaths.Add(path);
                 }
             }
 
-            return uploadedPaths;
+            return filePaths;
         }
 
         public void DeleteFile(string filePath)
@@ -69,10 +63,7 @@ namespace MovieApp.Infrastructure.Services
             if (string.IsNullOrEmpty(filePath))
                 return;
 
-            string fullPath = Path.Combine(
-                _webHostEnvironment.WebRootPath,
-                filePath.TrimStart('/')
-            );
+            var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, filePath);
 
             if (File.Exists(fullPath))
             {
@@ -82,6 +73,9 @@ namespace MovieApp.Infrastructure.Services
 
         public void DeleteFiles(List<string> filePaths)
         {
+            if (filePaths == null || !filePaths.Any())
+                return;
+
             foreach (var filePath in filePaths)
             {
                 DeleteFile(filePath);
@@ -93,11 +87,7 @@ namespace MovieApp.Infrastructure.Services
             if (string.IsNullOrEmpty(filePath))
                 return false;
 
-            string fullPath = Path.Combine(
-                _webHostEnvironment.WebRootPath,
-                filePath.TrimStart('/')
-            );
-
+            var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, filePath);
             return File.Exists(fullPath);
         }
     }

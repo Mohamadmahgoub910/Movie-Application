@@ -2,7 +2,6 @@
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
 using MovieApp.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 namespace MovieApp.Infrastructure.Services
 {
     // ═══════════════════════════════════════════════════════════

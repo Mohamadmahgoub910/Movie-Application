@@ -1,5 +1,177 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<MovieApp.Core.Entities.Movie>
 @{
+    ViewData["Title"] = "الأفلام";
 }
+
+<style>
+    .filter-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .movie-grid-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+        height: 100%;
+    }
+
+        .movie-grid-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .movie-grid-card img {
+            height: 350px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+    .movie-grid-body {
+        padding: 1.5rem;
+    }
+
+    .movie-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .movie-info {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .movie-price-tag {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+</style>
+
+<div class="page-header">
+    <h1><i class="fas fa-film me-2"></i>الأفلام</h1>
+    <p class="mb-0">تصفح مجموعتنا من الأفلام المميزة</p>
+</div>
+
+<!-- Filters -->
+<div class="filter-section">
+    <form method="get" class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label"><i class="fas fa-search me-1"></i>البحث</label>
+            <input type="text" class="form-control" name="search" value="@ViewBag.CurrentSearch" placeholder="ابحث عن فيلم..." />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label"><i class="fas fa-tags me-1"></i>التصنيف</label>
+            <select class="form-select" name="categoryId">
+                <option value="">جميع التصنيفات</option>
+                @if (ViewBag.Categories != null)
+                {
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.Id" selected="@(ViewBag.CurrentCategory == cat.Id)">@cat.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label"><i class="fas fa-building me-1"></i>السينما</label>
+            <select class="form-select" name="cinemaId">
+                <option value="">جميع السينمات</option>
+                @if (ViewBag.Cinemas != null)
+                {
+                    @foreach (var cinema in ViewBag.Cinemas)
+                    {
+                        <option value="@cinema.Id" selected="@(ViewBag.CurrentCinema == cinema.Id)">@cinema.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label"><i class="fas fa-info-circle me-1"></i>الحالة</label>
+            <select class="form-select" name="status">
+                <option value="">جميع الحالات</option>
+                <option value="0" selected="@(ViewBag.CurrentStatus == MovieApp.Core.Entities.MovieStatus.ComingSoon)">قريباً</option>
+                <option value="1" selected="@(ViewBag.CurrentStatus == MovieApp.Core.Entities.MovieStatus.NowShowing)">يُعرض الآن</option>
+                <option value="2" selected="@(ViewBag.CurrentStatus == MovieApp.Core.Entities.MovieStatus.Ended)">انتهى</option>
+            </select>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-filter me-2"></i>تطبيق الفلاتر
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-redo me-2"></i>إعادة تعيين
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Movies Grid -->
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var movie in Model)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="movie-grid-card">
+                    <img src="@(string.IsNullOrEmpty(movie.MainImage) ? "/images/placeholder.jpg" : "/" +movie.MainImage)"
+                         alt="@movie.Name" />
+                    <div class="movie-grid-body">
+                        <h5 class="movie-title">@movie.Name</h5>
+                        <p class="movie-info">
+                            <i class="fas fa-tag me-1"></i>@movie.Category?.Name
+                        </p>
+                        <p class="movie-info">
+                            <i class="fas fa-building me-1"></i>@movie.Cinema?.Name
+                        </p>
+                        <p class="movie-info">
+                            <i class="fas fa-calendar me-1"></i>@movie.ReleaseDateTime.ToString("dd/MM/yyyy")
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="movie-price-tag">@movie.Price.ToString("N2") جنيه</span>
+                            <span class="badge @(movie.Status == MovieApp.Core.Entities.MovieStatus.NowShowing ? "bg-success" : movie.Status == MovieApp.Core.Entities.MovieStatus.ComingSoon ? "bg-warning" : "bg-secondary")">
+                                @(movie.Status == MovieApp.Core.Entities.MovieStatus.NowShowing ? "يُعرض الآن" : movie.Status == MovieApp.Core.Entities.MovieStatus.ComingSoon ? "قريباً" : "انتهى")
+                            </span>
+                        </div>
+                        <a asp-action="Details" asp-route-id="@movie.Id" class="btn btn-primary w-100">
+                            <i class="fas fa-eye me-2"></i>عرض التفاصيل
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>
+                لا توجد أفلام تطابق معايير البحث
+            </div>
+        </div>
+    }
+</div>

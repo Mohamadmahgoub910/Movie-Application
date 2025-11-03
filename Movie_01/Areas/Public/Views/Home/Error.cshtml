@@ -1,0 +1,25 @@
+﻿@model MovieApp.Core.ViewModels.ErrorViewModel
+@{
+    ViewData["Title"] = "خطأ";
+}
+
+<div class="text-center">
+    <h1 class="text-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        خطأ
+    </h1>
+    <h2 class="text-danger">حدث خطأ أثناء معالجة طلبك.</h2>
+
+    @if (Model.ShowRequestId)
+    {
+        <p>
+            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        </p>
+    }
+
+    <div class="mt-4">
+        <a asp-area="Public" asp-controller="Home" asp-action="Index" class="btn btn-primary">
+            <i class="fas fa-home me-2"></i>العودة للرئيسية
+        </a>
+    </div>
+</div>

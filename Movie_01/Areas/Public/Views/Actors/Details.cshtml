@@ -1,0 +1,142 @@
+﻿@using MovieApp.Core.Entities
+@model Actor
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<style>
+    .actor-profile {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .actor-photo {
+        width: 100%;
+        max-width: 400px;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .movie-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        background: white;
+    }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .movie-card img {
+            height: 300px;
+            object-fit: cover;
+            width: 100%;
+        }
+</style>
+
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-2"></i>رجوع
+    </a>
+</div>
+
+<div class="actor-profile">
+    <div class="row">
+        <div class="col-md-4 text-center mb-4">
+            <img src="@(string.IsNullOrEmpty(Model.ProfilePicture) ? "/images/placeholder-actor.jpg" : Model.ProfilePicture)"
+                 alt="@Model.Name" class="actor-photo" />
+        </div>
+
+        <div class="col-md-8">
+            <h1 class="mb-3">@Model.Name</h1>
+
+            @if (Model.DateOfBirth.HasValue)
+            {
+                <p class="mb-2">
+                    <i class="fas fa-birthday-cake text-primary me-2"></i>
+                    <strong>تاريخ الميلاد:</strong> @Model.DateOfBirth.Value.ToString("dd/MM/yyyy")
+                    <span class="text-muted">
+                        (العمر: @((DateTime.Now.Year - Model.DateOfBirth.Value.Year)) سنة)
+                    </span>
+                </p>
+            }
+
+            <p class="mb-2">
+                <i class="fas fa-film text-primary me-2"></i>
+                <strong>عدد الأفلام:</strong>
+                <span class="badge bg-primary fs-6">@Model.MovieActors.Count فيلم</span>
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model.Bio))
+            {
+                <hr class="my-3" />
+                <h4><i class="fas fa-info-circle me-2"></i>السيرة الذاتية</h4>
+                <p class="text-muted">@Model.Bio</p>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.MovieActors.Any())
+{
+    <h2 class="mb-4">
+        <i class="fas fa-video me-2"></i>
+        الأفلام التي شارك فيها
+    </h2>
+
+    <div class="row">
+        @foreach (var movieActor in Model.MovieActors)
+        {
+            var movie = movieActor.Movie;
+            <div class="col-md-6 col-lg-4">
+                <div class="movie-card">
+                    <img src="@(string.IsNullOrEmpty(movie.MainImage) ? "/images/placeholder.jpg" : movie.MainImage)"
+                         alt="@movie.Name" />
+                    <div class="p-3">
+                        <h5 class="mb-2">@movie.Name</h5>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-tag me-1"></i>@movie.Category?.Name
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="h5 text-primary mb-0">@movie.Price.ToString("C")</span>
+                            <span class="badge @(movie.Status == MovieStatus.NowShowing ? "bg-success" : "bg-warning")">
+                                @(movie.Status == MovieStatus.NowShowing ? "يُعرض الآن" : "قريباً")
+                            </span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-calendar me-1"></i>
+                            @movie.ReleaseDateTime.ToString("dd/MM/yyyy")
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a asp-controller="Movies" asp-action="Details" asp-route-id="@movie.Id"
+                               class="btn btn-sm btn-outline-primary flex-fill">
+                                <i class="fas fa-eye"></i> تفاصيل
+                            </a>
+                            <a asp-controller="Movies" asp-action="Edit" asp-route-id="@movie.Id"
+                               class="btn btn-sm btn-outline-warning flex-fill">
+                                <i class="fas fa-edit"></i> تعديل
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle fa-3x mb-3"></i>
+        <h4>لم يشارك في أي فيلم بعد</h4>
+        <p>أضف هذا الممثل إلى الأفلام المتاحة.</p>
+    </div>
+}

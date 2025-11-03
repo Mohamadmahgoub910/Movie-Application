@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using MovieApp.Core.ViewModels; // الـ namespace الصح
+using MovieApp.Core.ViewModels; 
 
 namespace MovieApp.Application.Services
 {
