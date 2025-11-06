@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.Core.Interfaces;
-using MovieApp.Infrastructure.Data;
 using MovieApp.Core.ViewModels;
+using MovieApp.Infrastructure.Data;
 
 namespace MovieApp.Areas.Admin.Controllers
 {
@@ -13,6 +14,7 @@ namespace MovieApp.Areas.Admin.Controllers
     /// SOLID: Single Responsibility - handles HTTP requests/responses only
     /// </summary>
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class MoviesController : Controller
     {
         private readonly IMovieService _movieService;

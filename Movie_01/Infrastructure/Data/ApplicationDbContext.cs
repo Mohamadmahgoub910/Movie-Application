@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MovieApp.Core.Entities;
 
 namespace MovieApp.Infrastructure.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -58,7 +60,6 @@ namespace MovieApp.Infrastructure.Data
                 .HasForeignKey(mi => mi.MovieId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Seed Data
             SeedData(modelBuilder);
         }
 
@@ -132,7 +133,7 @@ namespace MovieApp.Infrastructure.Data
                 }
             );
 
-            // Seed MovieActors (Many-to-Many relationships)
+            // Seed MovieActors
             modelBuilder.Entity<MovieActor>().HasData(
                 new MovieActor { MovieId = 1, ActorId = 1 },
                 new MovieActor { MovieId = 1, ActorId = 2 },

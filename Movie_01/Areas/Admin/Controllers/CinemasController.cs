@@ -2,11 +2,13 @@
 // CinemasController
 // ═══════════════════════════════════════════════════════════
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class CinemasController : Controller
 {
     private readonly ICinemaService _cinemaService;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
 
@@ -9,6 +10,7 @@ namespace MovieApp.Areas.Admin.Controllers
     // ═══════════════════════════════════════════════════════════
 
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;

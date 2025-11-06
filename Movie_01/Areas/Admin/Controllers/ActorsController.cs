@@ -2,11 +2,13 @@
 // ActorsController
 // ═══════════════════════════════════════════════════════════
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class ActorsController : Controller
 {
     private readonly IActorService _actorService;

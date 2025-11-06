@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MovieApp.Application.Services;
+using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
+using MovieApp.Core.Settings;
 using MovieApp.Infrastructure.Data;
 using MovieApp.Infrastructure.Repositories;
 using MovieApp.Infrastructure.Services;
@@ -25,41 +28,93 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 );
 
 // ═══════════════════════════════════════════════════════════════
-// 3. Register Repositories (SOLID: Dependency Inversion)
+// 3. Identity Configuration
 // ═══════════════════════════════════════════════════════════════
 
-// Generic Repository
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Password settings
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 6;
 
-// Unit of Work
+    // Lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+
+    // User settings
+    options.User.RequireUniqueEmail = true;
+
+    // Sign in settings
+    options.SignIn.RequireConfirmedEmail = false; 
+    options.SignIn.RequireConfirmedAccount = false; 
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// Cookie settings
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login"; 
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied"; 
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true; 
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+    options.Cookie.SameSite = SameSiteMode.Lax; 
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 4. Email Settings
+// ═══════════════════════════════════════════════════════════════
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+// ═══════════════════════════════════════════════════════════════
+// 5. Register Repositories
+// ═══════════════════════════════════════════════════════════════
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // ═══════════════════════════════════════════════════════════════
-// 4. Register Services (SOLID: Dependency Inversion)
+// 6. Register Services
 // ═══════════════════════════════════════════════════════════════
 
-// File Service
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFileService, FileService>();
-
-// Movie Service
 builder.Services.AddScoped<IMovieService, MovieService>();
-
-// Category Service
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-
-// Actor Service
 builder.Services.AddScoped<IActorService, ActorService>();
-
-// Cinema Service
 builder.Services.AddScoped<ICinemaService, CinemaService>();
-
-// Analytics Service
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
 var app = builder.Build();
 
 // ═══════════════════════════════════════════════════════════════
-// 5. Configure the HTTP request pipeline
+// 7. Seed Roles and Admin User
+// ═══════════════════════════════════════════════════════════════
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        await SeedRolesAndAdminAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 8. Configure the HTTP request pipeline
 // ═══════════════════════════════════════════════════════════════
 
 if (!app.Environment.IsDevelopment())
@@ -69,164 +124,95 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(); 
 
 app.UseRouting();
 
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 // ═══════════════════════════════════════════════════════════════
-// 6. Configure Routes (IMPORTANT: Order matters!)
+// 9. Configure Routes
 // ═══════════════════════════════════════════════════════════════
 
-// ⚠️ الترتيب مهم جداً! Areas أولاً ثم Default
-
-// Admin Area Route (أول حاجة)
+// Area routes (Admin, Public)
 app.MapControllerRoute(
-    name: "admin",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
-);
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-// Public Area Route (تاني حاجة - اختياري)
-app.MapControllerRoute(
-    name: "public",
-    pattern: "Public/{controller=Home}/{action=Index}/{id?}",
-    defaults: new { area = "Public" }
-);
-
-// Default Route (آخر حاجة)
+// Default route (Public Area)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}",
-    defaults: new { area = "Public" } // ← هنا الإضافة المهمة
-);
+    defaults: new { area = "Public" });
 
 app.Run();
 
-/*
-═══════════════════════════════════════════════════════════════════
-📝 شرح Routes Configuration
-═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// 10. Seed Data Method
+// ═══════════════════════════════════════════════════════════════
 
-🎯 الترتيب الصحيح:
-1. Areas Route → يبحث أولاً في Areas
-2. Public Area Route → للـ Public Area بشكل مباشر
-3. Default Route → للصفحة الرئيسية
-
-═══════════════════════════════════════════════════════════════════
-🌐 URL Examples
-═══════════════════════════════════════════════════════════════════
-
-Admin Area:
-  ✅ https://localhost:5001/Admin
-  ✅ https://localhost:5001/Admin/Home/Index
-  ✅ https://localhost:5001/Admin/Movies/Index
-  ✅ https://localhost:5001/Admin/Movies/Create
-
-Public Area:
-  ✅ https://localhost:5001
-  ✅ https://localhost:5001/Public
-  ✅ https://localhost:5001/Public/Home/Index
-  ✅ https://localhost:5001/Home/Index (مع default area)
-
-═══════════════════════════════════════════════════════════════════
-🎯 SOLID في DI Registration
-═══════════════════════════════════════════════════════════════════
-
-✅ Dependency Inversion Principle:
-   - نسجل Interface → Implementation
-   - Controllers تعتمد على IMovieService وليس MovieService
-
-✅ Single Responsibility:
-   - كل Service له مسؤولية واحدة
-   - MovieService → Movie operations
-   - FileService → File operations
-
-✅ Interface Segregation:
-   - Interfaces صغيرة ومتخصصة
-   - IMovieService, ICategoryService (ليس IService واحد كبير)
-
-✅ Open/Closed Principle:
-   - يمكن إضافة Services جديدة بدون تعديل الموجود
-   - فقط نضيف AddScoped جديد
-
-✅ Liskov Substitution:
-   - يمكن استبدال MovieService بـ MockMovieService للتجربة
-   - طالما يطبق IMovieService
-
-═══════════════════════════════════════════════════════════════════
-📌 Usage في Controller
-═══════════════════════════════════════════════════════════════════
-
-// Admin Controller
-namespace MovieApp.Areas.Admin.Controllers
+async Task SeedRolesAndAdminAsync(IServiceProvider serviceProvider)
 {
-    [Area("Admin")] // ← مهم جداً!
-    public class MoviesController : Controller
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    // Create Roles
+    string[] roles = { "Admin", "User" };
+
+    foreach (var role in roles)
     {
-        private readonly IMovieService _movieService;
-
-        // ASP.NET Core يحقن IMovieService تلقائياً
-        public MoviesController(IMovieService movieService)
+        if (!await roleManager.RoleExistsAsync(role))
         {
-            _movieService = movieService;
+            await roleManager.CreateAsync(new IdentityRole(role));
         }
+    }
 
-        public async Task<IActionResult> Index()
+    // Create Admin User
+    var adminEmail = "admin@movieapp.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser
         {
-            var movies = await _movieService.GetAllMoviesAsync();
-            return View(movies);
+            UserName = adminEmail,
+            Email = adminEmail,
+            FullName = "مدير النظام",
+            EmailConfirmed = true, 
+            IsActive = true,
+            CreatedAt = DateTime.Now
+        };
+
+        var result = await userManager.CreateAsync(adminUser, "Admin@123");
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+
+    
+    var testUserEmail = "user@movieapp.com";
+    var testUser = await userManager.FindByEmailAsync(testUserEmail);
+
+    if (testUser == null)
+    {
+        testUser = new ApplicationUser
+        {
+            UserName = testUserEmail,
+            Email = testUserEmail,
+            FullName = "مستخدم تجريبي",
+            EmailConfirmed = true,
+            IsActive = true,
+            CreatedAt = DateTime.Now
+        };
+
+        var result = await userManager.CreateAsync(testUser, "User@123");
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(testUser, "User");
         }
     }
 }
-
-// Public Controller
-namespace MovieApp.Areas.Public.Controllers
-{
-    [Area("Public")] // ← مهم جداً!
-    public class HomeController : Controller
-    {
-        private readonly IAnalyticsService _analyticsService;
-
-        public HomeController(IAnalyticsService analyticsService)
-        {
-            _analyticsService = analyticsService;
-        }
-
-        public async Task<IActionResult> Index()
-        {
-            var dashboard = await _analyticsService.GetDashboardStatisticsAsync();
-            return View(dashboard);
-        }
-    }
-}
-
-
-═══════════════════════════════════════════════════════════════════
-🔥 Lifetime Types
-═══════════════════════════════════════════════════════════════════
-
-1️⃣ AddScoped: (الأكثر استخداماً)
-   - Instance واحد لكل HTTP Request
-   - مناسب للـ DbContext والـ Repositories والـ Services
-   - Example: MovieService, UnitOfWork
-
-2️⃣ AddSingleton: (للحاجات الثابتة)
-   - Instance واحد لكل التطبيق
-   - Example: IConfiguration, Caching Services
-
-3️⃣ AddTransient: (للحاجات الخفيفة)
-   - Instance جديد في كل مرة
-   - Example: Helper classes, Validators
-
-═══════════════════════════════════════════════════════════════════
-✅ Best Practices
-═══════════════════════════════════════════════════════════════════
-
-1. استخدم AddScoped للـ Services العادية
-2. استخدم AddSingleton للحاجات اللي مش بتتغير
-3. استخدم AddTransient للـ Lightweight services
-4. دايماً سجل Interface → Implementation
-5. لا تستخدم new للـ Services في Controllers
-
-*/

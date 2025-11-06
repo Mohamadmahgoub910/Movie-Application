@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "تأكيد التسجيل";
+}
+
+<style>
+    .confirmation-container {
+        max-width: 600px;
+        margin: 50px auto;
+        text-align: center;
+    }
+
+    .confirmation-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 3rem;
+    }
+
+    .success-icon {
+        font-size: 5rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="confirmation-container">
+    <div class="confirmation-card">
+        <i class="fas fa-envelope-open-text success-icon"></i>
+        <h2 class="mb-4">تم إرسال رسالة التفعيل!</h2>
+        <p class="lead">تم إنشاء حسابك بنجاح</p>
+        <p>يرجى التحقق من بريدك الإلكتروني والضغط على رابط التفعيل لتفعيل حسابك.</p>
+        <div class="alert alert-info mt-4">
+            <i class="fas fa-info-circle me-2"></i>
+            إذا لم تجد الرسالة، تحقق من مجلد البريد المزعج (Spam)
+        </div>
+        <a asp-action="Login" class="btn btn-primary mt-3">
+            <i class="fas fa-sign-in-alt me-2"></i>الذهاب لتسجيل الدخول
+        </a>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+}
+
+<style>
+    .auth-container {
+        max-width: 500px;
+        margin: 50px auto;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px 15px 0 0;
+        text-align: center;
+        margin: -2rem -2rem 2rem -2rem;
+    }
+
+        .auth-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+
+    .btn-auth {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 12px;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+        .btn-auth:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+</style>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-sign-in-alt fa-2x mb-2"></i>
+            <h2>تسجيل الدخول</h2>
+        </div>
+
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="form-floating">
+                <input asp-for="Email" class="form-control" placeholder="البريد الإلكتروني" />
+                <label asp-for="Email">البريد الإلكتروني</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating">
+                <input asp-for="Password" class="form-control" placeholder="كلمة المرور" />
+                <label asp-for="Password">كلمة المرور</label>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label">تذكرني</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth w-100">
+                <i class="fas fa-sign-in-alt me-2"></i>دخول
+            </button>
+        </form>
+
+        <hr class="my-4" />
+
+        <div class="text-center">
+            <p class="mb-2"><a asp-action="ForgotPassword">نسيت كلمة المرور؟</a></p>
+            <p class="mb-0">ليس لديك حساب؟ <a asp-action="Register">تسجيل حساب جديد</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
