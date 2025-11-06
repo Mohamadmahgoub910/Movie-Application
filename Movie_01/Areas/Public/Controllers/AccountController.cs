@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using MovieApp.Core.Entities;
 using MovieApp.Core.Interfaces;
-using MovieApp.ViewModels.Account;
+using MovieApp.Core.ViewModels.Account;
 using System.Text;
 using System.Text.Encodings.Web;
 
-namespace MovieApp.Controllers
+namespace MovieApp.Areas.Public.Controllers
 {
+    [Area("Public")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

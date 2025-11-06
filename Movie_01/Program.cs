@@ -58,9 +58,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 // Cookie settings
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Account/Login"; 
-    options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/AccessDenied"; 
+    options.LoginPath = "/Public/Account/Login";
+    options.LogoutPath = "/Public/Account/Logout";
+    options.AccessDeniedPath = "/Public/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.SlidingExpiration = true;
     options.Cookie.HttpOnly = true; 
